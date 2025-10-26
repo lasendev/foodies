@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -70,6 +71,33 @@ public class FoodServiceImpl implements FoodService {
     public List<FoodResponse> readFoods() {
         List<FoodEntity> databaseEntries = foodRepository.findAll();
         return databaseEntries.stream().map(object -> convertToResponse(object)).collect(Collectors.toList());
+    }
+
+    @Override
+    public FoodResponse readFood(String id) {
+        FoodEntity databaseEntrie = foodRepository.findById(id).orElseThrow(() -> new RuntimeException("Food not found for the given id : "+ id));
+        return convertToResponse(databaseEntrie);
+    }
+
+    @Override
+    public boolean deleteFile(String fileName) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+        s3Client.deleteObject(deleteObjectRequest);
+        return true;
+    }
+
+    @Override
+    public void deleteFood(String id) {
+        FoodResponse response = readFood(id);
+        String imageUrl = response.getImageUrl();
+        String filename = imageUrl.substring(imageUrl.lastIndexOf("/")+1);
+        boolean isFileDelete = deleteFile(filename);
+                if(isFileDelete){
+                    foodRepository.deleteById(response.getId());
+                }
     }
 
     private FoodEntity convertEntity(FoodRequest request){
