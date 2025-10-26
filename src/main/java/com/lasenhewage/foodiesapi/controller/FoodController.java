@@ -6,11 +6,14 @@ import com.lasenhewage.foodiesapi.io.FoodRequest;
 import com.lasenhewage.foodiesapi.io.FoodResponse;
 import com.lasenhewage.foodiesapi.service.FoodService;
 import lombok.AllArgsConstructor;
+import lombok.Generated;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/foods")
@@ -35,4 +38,9 @@ public class FoodController {
         return response;
     }
 
+
+    @GetMapping
+    public List<FoodResponse> readFoods(){
+        return foodService.readFoods();
+    }
 }
