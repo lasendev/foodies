@@ -1,0 +1,12 @@
+# Build and IDE files
+/target/
+/.idea/
+/.vscode/
+*.iml
+
+# OS files
+.DS_Store
+
+# Credentials and configs
+*.properties
+.env
